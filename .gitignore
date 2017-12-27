@@ -5,3 +5,4 @@ yarn.lock
 deploy.ps1
 *.log
 res/production
+build
