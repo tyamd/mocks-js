@@ -1,0 +1,25 @@
+{
+    "request": {
+        "verb": "get",
+        "uri": "/images"
+    },
+    "responses": [
+        {
+            "status": "200",
+            "type": "rp",
+            "options": {
+                "protocol": "https:",
+                "host": "upload.wikimedia.org",
+                "port": 443,
+                "method": "get",
+                "path": "/wikipedia/fr/a/a2/San_Antonio_Spurs.svg",
+                "headers" : {
+                    "host": "upload.wikimedia.org"
+                }
+            },
+            "headers": {
+                "result": "result"
+            }
+        }
+    ]
+}

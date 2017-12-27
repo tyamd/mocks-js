@@ -1,0 +1,26 @@
+{
+    "request": {
+        "verb": "get",
+        "uri": "/apod",
+        "contenttype": "application/json"
+    },
+    "responses": [
+        {
+            "status": "200",
+            "type": "rp",
+            "options": {
+                "protocol": "https:",
+                "host": "api.nasa.gov",
+                "port": 443,
+                "method": "get",
+                "headers": {
+                    "host": "api.nasa.gov"
+                },
+                "path": "/planetary/apod?api_key=DEMO_KEY"
+            },
+            "headers": {
+                "result": "result"
+            }
+        }
+    ]
+}

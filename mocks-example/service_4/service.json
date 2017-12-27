@@ -1,0 +1,23 @@
+{
+    "request": {
+        "verb": "get",
+        "uri": "/users/2",
+        "contenttype": "application/json"
+    },
+    "responses": [
+        {
+            "status": "200",
+            "type": "rp",
+            "options": {
+                "protocol": "http:",
+                "host": "localhost",
+                "port": 8081,
+                "method": "post",
+                "path": "/user?name=mahesh"
+            },
+            "headers": {
+                "result": "result"
+            }
+        }
+    ]
+}

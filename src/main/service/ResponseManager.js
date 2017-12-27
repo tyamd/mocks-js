@@ -85,15 +85,19 @@ class ResponseManager {
             options.headers = Object.assign({}, req.headers, options.headers);
             options.headers.cookie = req.headers.cookie + ";" + options.headers.cookie;
             const reverseReq = canal.request(options, (reverseResponse) => {
-                let data = '';
+                let buffer = undefined;
                 reverseResponse.on('data', (chunk) => {
-                    data += chunk;
+                    if (buffer === undefined) {
+                        buffer = new Buffer(chunk);
+                    } else {
+                        buffer = Buffer.concat([buffer, new Buffer(chunk)]);
+                    }
                 });
                 reverseResponse.on('end', () => {
                     Object.assign(reverseResponse.headers, reverseResponse.headers, response.headers)
                     res.header(reverseResponse.headers);
                     res.status(reverseResponse.statusCode);
-                    res.end(data);
+                    res.end(buffer);
                 });
             });
 
