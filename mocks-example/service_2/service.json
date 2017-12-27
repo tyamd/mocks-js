@@ -1,0 +1,22 @@
+{ 
+    "request" : {
+        "verb" : "post",
+        "uri" : "/user",
+        "contenttype" : "application/json"
+    },
+    "responses" : [{
+        "conditions": {
+            "headers" : [],
+            "params" : [{"path": "$.name", "value" : "mahesh"}]
+        },
+        "status" : "200",
+        "type": "String",
+        "headers" : {"content-type" : "application/json"},
+        "body" : "{\"name\":\"mahesh\",\"password\":\"password1\",\"profession\":\"teacher\",\"id\":1}"
+    }, {
+        "status" : "200",
+        "type": "String",
+        "headers" : {"content-type" : "application/json"},
+        "body" : "{\"name\":\"suresh\",\"password\":\"password2\",\"profession\":\"librarian\",\"id\":2}"
+    }]
+}

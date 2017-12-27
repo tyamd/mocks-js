@@ -5,6 +5,7 @@ var path = require('path');
 var jsonpath = require('jsonpath');
 var https = require('https');
 var http = require('http');
+var winston = require('winston');
 
 class ResponseManager {
 
@@ -94,7 +95,7 @@ class ResponseManager {
             });
 
             reverseReq.on('error', (e) => {
-                console.error(`problem with request: ${e.message}`);
+                winston.error(`problem with request: ${e.message}`);
             });
 
             // post the data
@@ -102,7 +103,7 @@ class ResponseManager {
                 if (request.contenttype == 'application/json') {
                     reverseReq.write(JSON.stringify(req.body));
                 } else {
-                    console.error("Request content type '%s' not yet supported in reverse proxy mode", request.contenttype)
+                    winston.error("Request content type '%s' not yet supported in reverse proxy mode", request.contenttype)
                 }
 
             }

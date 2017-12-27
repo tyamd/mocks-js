@@ -1,0 +1,48 @@
+{
+    "request": {
+        "verb": "get",
+        "uri": "/users"
+    },
+    "responses": [
+        {
+            "conditions": {
+                "headers": [],
+                "params": [{
+                    "name": "profession",
+                    "value": "teacher"
+                }]
+            },
+            "status": "200",
+            "type": "file",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "./teachers.json"
+        },
+        {
+            "conditions": {
+                "headers": [
+                    {
+                        "name": "fake-header",
+                        "value": ".*fake.*"
+                    }
+                ],
+                "params": []
+            },
+            "status": "200",
+            "type": "file",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "./librarians.json"
+        },
+        {
+            "status": "200",
+            "type": "file",
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "./users.json"
+        }
+    ]
+}

@@ -1,4 +1,7 @@
 node_modules
-mocks
 .vscode
 init.bat
+yarn.lock
+deploy.ps1
+*.log
+res/production
