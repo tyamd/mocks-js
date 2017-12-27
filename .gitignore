@@ -6,3 +6,4 @@ deploy.ps1
 *.log
 res/production
 build
+dist
