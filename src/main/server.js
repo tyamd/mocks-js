@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 var xmlparser = require('express-xml-bodyparser');
 var winston = require('winston');
 var app = express();
+var https = require('https');
+var http = require('http');
 var MockService = require('./service/MockService');
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -18,8 +20,8 @@ app.use(xmlparser());
 var loginfo = 'combined.log';
 var logerror = 'error.log';
 
-fs.unlink(loginfo, ()=> {
-  winston.add(winston.transports.File, { name: 'info', filename: loginfo, level: 'info', json:false });
+fs.unlink(loginfo, () => {
+  winston.add(winston.transports.File, { name: 'info', filename: loginfo, level: 'info', json: false });
 });
 fs.unlink(logerror, () => {
   winston.add(winston.transports.File, { name: 'error', filename: logerror, level: 'error', json: false });
@@ -60,14 +62,33 @@ app.get('/', (req, res) => {
   });
 });
 
+
 /* --------------------------------*/
-/* LOAD SERVER                     */
+/* LOAD SERVER HTTP                */
 /* --------------------------------*/
-var server = app.listen(configuration.port, function () {
 
-  var host = server.address().address
-  var port = server.address().port
+if (configuration.http) {
+  let httpserver = http.createServer(app).listen(configuration.http.port, function () {
 
-  winston.info("Mock-js app listening at http://%s:%s", host, port)
+    let host = httpserver.address().address
+    let port = httpserver.address().port
 
-});
+    winston.info("Mock-js app listening at http://%s:%s", host, port)
+
+  });
+}
+if (configuration.https) {
+  let options = {
+    key: fs.readFileSync(configuration.https.private),
+    cert: fs.readFileSync(configuration.https.public),
+    passphrase: configuration.https.passphrase
+  };
+  let httpsserver = https.createServer(options, app).listen(configuration.https.port, function () {
+
+    let host = httpsserver.address().address
+    let port = httpsserver.address().port
+
+    winston.info("Secure Mock-js app listening at https://%s:%s", host, port)
+
+  });
+}

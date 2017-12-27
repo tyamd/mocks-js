@@ -1,5 +1,6 @@
 node_modules
 .vscode
+.keystore
 init.bat
 yarn.lock
 deploy.ps1
