@@ -36,6 +36,13 @@ var dirname = configuration.folder;
 var mockService = new MockService(dirname, app);
 
 /* --------------------------------*/
+/* LOAD SECURITY OPTION            */
+/* --------------------------------*/
+if (!configuration.secure) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
+
+/* --------------------------------*/
 /* LOAD LOG SERVICES               */
 /* --------------------------------*/
 

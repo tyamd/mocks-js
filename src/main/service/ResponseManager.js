@@ -72,6 +72,7 @@ class ResponseManager {
                     break;
                 case 'rp':
                     this.callReverseProxy(req, res, response, request);
+                    break;
                 case 'String':
                 default:
                     res.end(response.body);
@@ -79,17 +80,19 @@ class ResponseManager {
             }
         }
         this.callReverseProxy = (req, res, response, request) => {
-            var canal = response.options.protocol == 'https:' ? https : http;
-            Object.assign(response.options.headers, response.options.headers, req.headers);
-            const reverseReq = canal.request(response.options, (reverseResponse) => {
+            let options = JSON.parse(JSON.stringify(response.options));
+            let canal = options.protocol == 'https:' ? https : http;
+            options.headers = Object.assign({}, req.headers, options.headers);
+            options.headers.cookie = req.headers.cookie + ";" + options.headers.cookie;
+            const reverseReq = canal.request(options, (reverseResponse) => {
                 let data = '';
                 reverseResponse.on('data', (chunk) => {
                     data += chunk;
                 });
                 reverseResponse.on('end', () => {
-                    Object.assign(responseHeader.headers, reverseResponse.headers, response.headers)
+                    Object.assign(reverseResponse.headers, reverseResponse.headers, response.headers)
                     res.header(reverseResponse.headers);
-                    res.status(reverseResponse.status);
+                    res.status(reverseResponse.statusCode);
                     res.end(data);
                 });
             });
@@ -99,8 +102,8 @@ class ResponseManager {
             });
 
             // post the data
-            if (req.body) {
-                if (request.contenttype == 'application/json') {
+            if (req.body && JSON.stringify(req.body) != "{}") {
+                if (request.contenttype.startsWith('application/json')) {
                     reverseReq.write(JSON.stringify(req.body));
                 } else {
                     winston.error("Request content type '%s' not yet supported in reverse proxy mode", request.contenttype)
