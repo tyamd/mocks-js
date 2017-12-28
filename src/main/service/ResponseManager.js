@@ -42,7 +42,7 @@ class ResponseManager {
                                     if (req.body) {
                                         let path = param.path;
                                         let bodyValue = jsonpath.query(req.body, path);
-                                        currentValue = bodyValue && bodyValue.find(item => item.match(value));
+                                        currentValue = bodyValue && bodyValue.find(item => JSON.stringify(item).match(value));
                                     } else {
                                         currentValue = false;
                                     }
@@ -84,6 +84,9 @@ class ResponseManager {
             let canal = options.protocol == 'https:' ? https : http;
             options.headers = Object.assign({}, req.headers, options.headers);
             options.headers.cookie = req.headers.cookie + ";" + options.headers.cookie;
+            if (options.path === undefined) {
+                options.path = req.path
+            }
             const reverseReq = canal.request(options, (reverseResponse) => {
                 let buffer = undefined;
                 reverseResponse.on('data', (chunk) => {

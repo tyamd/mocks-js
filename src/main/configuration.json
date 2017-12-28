@@ -1,5 +1,12 @@
 {
-    "port" : 8081,
     "folder" : "./mocks-example",
-    "ssl" : false
+    "ssl" : false,
+    "http" : {
+        "port" : 9080
+    },
+    "https" : {
+        "port" : 9443,
+        "passphrase" : "./.keystore/passphrase",
+        "pfx" : "./.keystore/keystore.pfx"
+    }
 }
