@@ -8,11 +8,19 @@ var http = require('http');
 var https = require('https');
 var MockService = require('./service/MockService');
 
-
+/* -------------------------------*/
+/*       INIT EXPRESS             */
+/* -------------------------------*/
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(xmlparser());
+
+
+/* -------------------------------*/
+/*       INIT CONFIGURATION       */
+/* -------------------------------*/
+var configuration = JSON.parse(fs.readFileSync(__dirname + '/configuration.json', 'utf8'));
 
 /* -------------------------------*/
 /*          INIT LOGGER           */
@@ -25,17 +33,15 @@ fs.unlink(loginfo, ()=> {
   winston.add(winston.transports.File, { name: 'info', filename: loginfo, level: 'info', json:false });
 });
 fs.unlink(logerror, () => {
-  winston.add(winston.transports.File, { name: 'error', filename: logerror, level: 'error', json: false });
+  winston.add(winston.transports.File, { name: 'error', filename: logerror, level: 'error', json: false });  
 });
-
-
+winston.level = configuration.level;
 
 /* --------------------------------*/
 /* LOAD SERVICES                   */
 /* --------------------------------*/
-var configuration = JSON.parse(fs.readFileSync(__dirname + '/configuration.json', 'utf8'));
-var dirname = configuration.folder;
 
+var dirname = configuration.folder;
 var mockService = new MockService(dirname, app);
 
 /* --------------------------------*/

@@ -1,4 +1,5 @@
 {
+    "level" : "debug",
     "folder" : "./mocks-example",
     "ssl" : false,
     "http" : {
