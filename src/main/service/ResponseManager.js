@@ -6,6 +6,7 @@ var jsonpath = require('jsonpath');
 var https = require('https');
 var http = require('http');
 var winston = require('winston');
+var formurlencoded = require('form-urlencoded');
 
 class ResponseManager {
 
@@ -14,7 +15,11 @@ class ResponseManager {
         this.request = request;
         this.responses = responses;
         this.callback = (req, res) => {
-            this.responses.find(response => {
+            winston.debug('Request : %s %s', req.method, req.path);
+            if (req.body && JSON.stringify(req.body) != "{}") {
+                winston.debug('Request body : %s', JSON.stringify(req.body))
+            }
+            this.responses.find(response => {                
                 let isResponse = true;
                 if (response.conditions) {
                     let headers = response.conditions.headers;
@@ -31,7 +36,7 @@ class ResponseManager {
                         isResponse = isResponse && params.reduce((accumulator, param) => {
                             let value = param.value;
                             let currentValue = false;
-                            switch (this.request.verb) {
+                            switch (req.method.toLowerCase()) {
                                 case 'delete':
                                 case 'get':
                                     let name = param.name;
@@ -79,13 +84,16 @@ class ResponseManager {
                     break;
             }
         }
-        this.callReverseProxy = (req, res, response, request) => {
+        this.callReverseProxy = (req, res, response, request) => {            
             let options = JSON.parse(JSON.stringify(response.options));
             let canal = options.protocol == 'https:' ? https : http;
             options.headers = Object.assign({}, req.headers, options.headers);
             options.headers.cookie = req.headers.cookie + ";" + options.headers.cookie;
             if (options.path === undefined) {
-                options.path = req.path
+                options.path = req.originalUrl;
+            }
+            if (options.method === undefined) {
+                options.method = req.method;
             }
             const reverseReq = canal.request(options, (reverseResponse) => {
                 let buffer = undefined;
@@ -110,10 +118,16 @@ class ResponseManager {
 
             // post the data
             if (req.body && JSON.stringify(req.body) != "{}") {
-                if (request.contenttype.startsWith('application/json')) {
-                    reverseReq.write(JSON.stringify(req.body));
-                } else {
-                    winston.error("Request content type '%s' not yet supported in reverse proxy mode", request.contenttype)
+                let contenttype = req.headers ? req.headers['content-type'] : undefined;
+                if (contenttype) {
+                    if (contenttype.startsWith('application/json')) {
+                        reverseReq.write(JSON.stringify(req.body));
+                    } else if (contenttype.startsWith('application/x-www-form-urlencoded')) {
+                        reverseReq.write(formurlencoded(req.body));
+                    }
+                }
+                if (!reverseReq.outputSire <= 0) {
+                    winston.error("Request content type '%s' not yet supported in reverse proxy mode", contenttype);
                 }
 
             }
