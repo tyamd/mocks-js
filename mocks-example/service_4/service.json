@@ -1,6 +1,6 @@
 {
     "request": {
-        "verb": "get",
+        "verb": ["get", "post"],
         "uri": "/users/2",
         "contenttype": "application/json"
     },
