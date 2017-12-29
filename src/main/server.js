@@ -35,7 +35,7 @@ fs.unlink(loginfo, ()=> {
 fs.unlink(logerror, () => {
   winston.add(winston.transports.File, { name: 'error', filename: logerror, level: 'error', json: false });  
 });
-winston.level = configuration.level;
+winston.level = configuration.loglevel ? configuration.loglevel : 'info';
 
 /* --------------------------------*/
 /* LOAD SERVICES                   */
