@@ -126,7 +126,7 @@ class ResponseManager {
                         reverseReq.write(formurlencoded(req.body));
                     }
                 }
-                if (!reverseReq.outputSire <= 0) {
+                if (!reverseReq.outputSize <= 0) {
                     winston.error("Request content type '%s' not yet supported in reverse proxy mode", contenttype);
                 }
 
