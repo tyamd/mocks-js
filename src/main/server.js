@@ -4,14 +4,23 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var xmlparser = require('express-xml-bodyparser');
 var winston = require('winston');
-var app = express();
-var https = require('https');
 var http = require('http');
+var https = require('https');
 var MockService = require('./service/MockService');
 
+/* -------------------------------*/
+/*       INIT EXPRESS             */
+/* -------------------------------*/
+var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(xmlparser());
+
+
+/* -------------------------------*/
+/*       INIT CONFIGURATION       */
+/* -------------------------------*/
+var configuration = JSON.parse(fs.readFileSync(__dirname + '/configuration.json', 'utf8'));
 
 /* -------------------------------*/
 /*          INIT LOGGER           */
@@ -24,17 +33,15 @@ fs.unlink(loginfo, () => {
   winston.add(winston.transports.File, { name: 'info', filename: loginfo, level: 'info', json: false });
 });
 fs.unlink(logerror, () => {
-  winston.add(winston.transports.File, { name: 'error', filename: logerror, level: 'error', json: false });
+  winston.add(winston.transports.File, { name: 'error', filename: logerror, level: 'error', json: false });  
 });
-
-
+winston.level = configuration.loglevel ? configuration.loglevel : 'info';
 
 /* --------------------------------*/
 /* LOAD SERVICES                   */
 /* --------------------------------*/
-var configuration = JSON.parse(fs.readFileSync(__dirname + '/configuration.json', 'utf8'));
-var dirname = configuration.folder;
 
+var dirname = configuration.folder;
 var mockService = new MockService(dirname, app);
 
 /* --------------------------------*/
@@ -66,29 +73,39 @@ app.get('/', (req, res) => {
 /* --------------------------------*/
 /* LOAD SERVER HTTP                */
 /* --------------------------------*/
-
 if (configuration.http) {
-  let httpserver = http.createServer(app).listen(configuration.http.port, function () {
-
-    let host = httpserver.address().address
-    let port = httpserver.address().port
-
+  let httpServer = http.createServer(app).listen(configuration.http.port, function () {
+  
+    let host = httpServer.address().address
+    let port = httpServer.address().port
+  
     winston.info("Mock-js app listening at http://%s:%s", host, port)
-
+  
   });
 }
+
+/* --------------------------------*/
+/* LOAD SERVER HTTPS               */
+/* --------------------------------*/
 if (configuration.https) {
-  let options = {
-    key: fs.readFileSync(configuration.https.private),
-    cert: fs.readFileSync(configuration.https.public),
-    passphrase: configuration.https.passphrase
-  };
-  let httpsserver = https.createServer(options, app).listen(configuration.https.port, function () {
-
-    let host = httpsserver.address().address
-    let port = httpsserver.address().port
-
-    winston.info("Secure Mock-js app listening at https://%s:%s", host, port)
-
+  let options = {};
+  if (configuration.https.pfx) {
+    options = {
+      pfx: fs.readFileSync(configuration.https.pfx),
+      passphrase: fs.readFileSync(configuration.https.passphrase)
+    }
+  } else {
+    options = {
+      key: fs.readFileSync(configuration.https.privatekey),
+      cert: fs.readFileSync(configuration.https.publickey)
+    }
+  }
+  let httpsServer = https.createServer(options, app).listen(configuration.https.port, function () {
+  
+    let host = httpsServer.address().address
+    let port = httpsServer.address().port
+  
+    winston.info("Secure Mock-js app listening at http://%s:%s", host, port)
+  
   });
 }

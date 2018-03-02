@@ -1,13 +1,13 @@
 {
+    "loglevel" : "debug",
     "folder" : "./mocks-example",
     "ssl" : false,
+    "http" : {
+        "port" : 9080
+    },
     "https" : {
         "port" : 9443,
-        "private" : "./.keystore/private.key.pem",
-        "public" : "./.keystore/public.pem",
-        "passphrase" : "./.keystore/passphrase"
-    },
-    "http" : {
-        "port" : 8081
+        "passphrase" : "./.keystore/passphrase",
+        "pfx" : "./.keystore/keystore.pfx"
     }
 }

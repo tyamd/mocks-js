@@ -45,19 +45,30 @@ class MockService {
             fs.readFile(fullPath, 'utf8', (err, data) => {
                 let service = JSON.parse(data);
                 let request = service.request;
-                let responses = service.responses;
-                winston.info("Load service " + request.uri);
+                let responses = service.responses;                
                 let responseManager = new ResponseManager(directory, request, responses);
-                switch (request.verb) {
-                    case 'get':
-                        this.app.get(request.uri, responseManager.callback);
-                        break;
-                    case 'post':
-                        this.app.post(request.uri, responseManager.callback);
-                        break;
-                    default:
-                        break;
+                if (!Array.isArray(request.verb)) {
+                    request.verb = [request.verb];
                 }
+                request.verb.forEach(verb => {
+                    winston.info("Load service : %s %s", verb.toUpperCase(), request.uri);
+                    switch (verb) {
+                        case 'delete':
+                            this.app.delete(request.uri, responseManager.callback);
+                            break;
+                        case 'get':
+                            this.app.get(request.uri, responseManager.callback);
+                            break;
+                        case 'put':
+                            this.app.put(request.uri, responseManager.callback);
+                            break;
+                        case 'post':
+                            this.app.post(request.uri, responseManager.callback);
+                            break;
+                        default:
+                            break;
+                    }                        
+                });
             });
         }
     }
